@@ -4,6 +4,9 @@
 #include "SQLiteWrapper.h"
 #include <FL/Enumerations.H>
 #include <string>
+
+enum { label_fontsz = 18 };
+
 enum {
     big_button_w = 770,
     small_buttow_w = 180,
@@ -13,7 +16,9 @@ enum {
     spacing_x = 10,
     spacing_y = button_h,
 };
+
 enum { number_col = 0, fullname_col, street_col, house_col, flat_col, id_col };
+
 enum {
     number_col_w = 700,
     fullname_col_w = 550,
@@ -21,6 +26,7 @@ enum {
     house_col_w = 810,
     flat_col_w = 755,
 };
+
 enum { header_r_font = 25, header_c_font = 16, cell_font = 15 };
 class DataTable : public MainTable {
 public:
@@ -61,15 +67,15 @@ public:
         if (val.empty() && inp_val.val.empty()) {
             if (active_col == 0 && c == 0) { sw->sortBy(0, val, active_col); }
             else {
-                sw->sortBy(c, val, active_col);
+                sw->sortBy(c, val, active_col, invert_temp);
             }
         }
         else if (!inp_val.val.empty()) {
             if (active_col == 0 && c == 0) {
-                sw->sortBy(inp_val.col, inp_val.val, active_col);
+                sw->sortBy(inp_val.col, inp_val.val, active_col, invert_temp);
             }
             else {
-                sw->sortBy(inp_val.col, inp_val.val, active_col);
+                sw->sortBy(inp_val.col, inp_val.val, active_col, invert_temp);
             }
         }
         else {
@@ -79,6 +85,12 @@ public:
         init_table_info();
         redraw();
         return;
+    }
+
+    void setInvert(bool invert)
+    {
+        invert_temp = invert;
+        sort(inp_val.col, inp_val.val);
     }
 private:
     void init_table_info()
@@ -297,6 +309,7 @@ private:
         std::string val;
     };
     input_value inp_val;
+    bool invert_temp;
 public:
     SQLiteWrapper* sw;
 };

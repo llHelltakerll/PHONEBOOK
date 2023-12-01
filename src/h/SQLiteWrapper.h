@@ -1,6 +1,9 @@
 #pragma once
-
+#include <codecvt>
+#include <cstring>
+#include <iconv.h>
 #include <iostream>
+#include <locale>
 #include <sqlite3.h>
 #include <sstream>
 #include <string>

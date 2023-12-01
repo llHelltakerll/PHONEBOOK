@@ -1,4 +1,6 @@
 #include "h/SQLiteWrapper.h"
+#include <cctype>
+#include <unicode/unistr.h>
 
 SQLiteWrapper::SQLiteWrapper(const char* dir, std::string table_name,
                              int flags, //
@@ -64,12 +66,39 @@ std::string SQLiteWrapper::getColText(int col) const
 void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
                            bool invert)
 {
-    std::string invert_comd = "";
+    std::string invert_comd;
+    const char* previousLocale = std::setlocale(LC_CTYPE, nullptr);
+    std::setlocale(LC_CTYPE, "ru_RU.UTF-8");
+
+    std::size_t len = std::mbstowcs(nullptr, val.c_str(), 0);
+    wchar_t* wbuffer = new wchar_t[len + 1];
+    std::mbstowcs(wbuffer, val.c_str(), len);
+    wbuffer[len] = L'\0';
+    std::wstring wstr(wbuffer);
+
+    // Используйте другую строку для хранения результата
+    std::wstring result;
+
+    for (wchar_t ch: wstr) {
+        // Добавление символа в квадратные скобки
+        result += L"[";
+        result += std::towupper(ch); // Приведение к нижнему регистру
+        result += std::tolower(ch); // Приведение к верхнему регистру
+        result += L"]";
+    }
+
+    // Освобождение буфера
+    delete[] wbuffer;
+
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    val = converter.to_bytes(result);
+    std::cout << val << std::endl;
+
     if (invert) { invert_comd = "DESC"; }
 
     sort_query = "SELECT * FROM main." + table_name + " WHERE "
-                 + col_name_vec[where_col] + " LIKE '" + val
-                 + "%' "
+                 + col_name_vec[where_col] + " GLOB '*" + val
+                 + "*\' COLLATE UNICODE "
                    "ORDER BY "
                  + col_name_vec[order_col] + " " + invert_comd
                  + " LIMIT 0, 49999;";
@@ -80,6 +109,7 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
     //                    "\""
     //                  + col_name_vec[order_col] + "\" ASC LIMIT 0, 49999";
     // }
+    std::setlocale(LC_CTYPE, previousLocale);
     std::cout << sort_query << "\n";
     prepare(sort_query);
 }

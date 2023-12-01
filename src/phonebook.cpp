@@ -1,8 +1,13 @@
 #include "h/DataTable.h"
+#include "h/DescButton.h"
 #include "h/Input.h"
 #include "h/SQLiteWrapper.h"
+#include <cctype>
+#include <clocale>
+#include <ctype.h>
+#include <locale>
 
-#define DB_DIR "/home/nix/code/phonebook2/data/sqlitedb.db"
+#define DB_DIR "/home/nix/code/phonebookVer/data/sqlitedb.db"
 
 enum {
     win_w = 1400,
@@ -15,7 +20,24 @@ enum { table_w = 1380, table_h = 480, table_x = 10, table_y = win_y - 150 };
 
 int main()
 {
-    SQLiteWrapper* sw;
+    //     // Установка локали для LC_CTYPE
+    //     std::setlocale(LC_CTYPE, "ru_RU.UTF-8");
+    //
+    //     // Создание std::wstring
+    //     std::wstring wstr = L"привет";
+    //
+    //     // Создание объекта для конвертации
+    //     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    //
+    //     // Конвертация в std::string
+    //     std::string str = converter.to_bytes(wstr);
+    //
+    //     // Вывод результата
+    //     std::cout << "Преобразованная строка (string): " << str << std::endl;
+    //
+    //     return 0;
+    // }
+    SQLiteWrapper* sw = nullptr;
     try {
         sw = new SQLiteWrapper(DB_DIR, "PHONEBOOK");
         Fl_Double_Window* win
@@ -41,6 +63,10 @@ int main()
         SortByInput* inp_flat = new SortByInput(
             table, big_button_w + spacing_x * 3 + small_buttow_w, button_h * 2,
             small_buttow_w, button_h, "Квартира: ", 5);
+
+        DescButton* descB = new DescButton(
+            table, big_button_w + spacing_x * 4 + 200 * 2, button_h * 3,
+            small_buttow_w / 8, button_h, "По убыванию");
 
         win->resizable(win);
         win->end();

@@ -4,14 +4,12 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Input_Choice.H>
 
-enum { fontsz = 18 };
-
 class OFLInput : public Fl_Input {
 public:
     OFLInput(int x, int y, int w, int h, const char* lb)
         : Fl_Input(x, y, w, h, lb)
     {
-        textsize(fontsz);
+        textsize(label_fontsz);
         align(FL_ALIGN_TOP_LEFT);
         labelsize(header_c_font);
         when(FL_WHEN_CHANGED);
@@ -27,7 +25,7 @@ private:
     }
 };
 
-class SortByInput : OFLInput {
+class SortByInput : public OFLInput {
     int sort;
     DataTable* table;
 public:
@@ -37,9 +35,6 @@ public:
           sort(sort)
     {}
 private:
-    virtual void SortByVal(DataTable*& table)
-    {
-        table->sort(sort, value(), true);
-    }
-    virtual void Input() { SortByVal(table); }
+    virtual void SortByVal() { table->sort(sort, value(), true); }
+    virtual void Input() { SortByVal(); }
 };
