@@ -1,11 +1,8 @@
 #include "h/DataTable.h"
 #include "h/DescButton.h"
-#include "h/Input.h"
 #include "h/SQLiteWrapper.h"
-#include <cctype>
-#include <clocale>
-#include <ctype.h>
-#include <locale>
+#include "h/TableInputSort.h"
+#include <FL/Fl_Double_Window.H>
 
 #define DB_DIR "/home/nix/code/phonebookVer/data/sqlitedb.db"
 
@@ -20,23 +17,6 @@ enum { table_w = 1380, table_h = 480, table_x = 10, table_y = win_y - 150 };
 
 int main()
 {
-    //     // Установка локали для LC_CTYPE
-    //     std::setlocale(LC_CTYPE, "ru_RU.UTF-8");
-    //
-    //     // Создание std::wstring
-    //     std::wstring wstr = L"привет";
-    //
-    //     // Создание объекта для конвертации
-    //     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-    //
-    //     // Конвертация в std::string
-    //     std::string str = converter.to_bytes(wstr);
-    //
-    //     // Вывод результата
-    //     std::cout << "Преобразованная строка (string): " << str << std::endl;
-    //
-    //     return 0;
-    // }
     SQLiteWrapper* sw = nullptr;
     try {
         sw = new SQLiteWrapper(DB_DIR, "PHONEBOOK");
@@ -46,22 +26,22 @@ int main()
         DataTable* table
             = new DataTable(table_x, table_y, table_w, table_h, sw);
 
-        SortByInput* inp_p_number = new SortByInput(
-            table, spacing_x, 0, mid_button_w, button_h, "Телефон:", 1);
+        TableInputSort* inp_p_number = new TableInputSort(
+            *table, spacing_x, 0, mid_button_w, button_h, "Телефон:", 1);
 
-        SortByInput* inp_full_name = new SortByInput(
-            table, spacing_x, button_h * 2, big_button_w, button_h, "ФИО:", 2);
+        TableInputSort* inp_full_name = new TableInputSort(
+            *table, spacing_x, button_h * 2, big_button_w, button_h, "ФИО:", 2);
 
-        SortByInput* inp_street
-            = new SortByInput(table, mid_button_w + spacing_x * 2, 0,
-                              mid_big_button_w, button_h, "Улица:", 3);
+        TableInputSort* inp_street
+            = new TableInputSort(*table, mid_button_w + spacing_x * 2, 0,
+                                 mid_big_button_w, button_h, "Улица:", 3);
 
-        SortByInput* inp_house_n
-            = new SortByInput(table, big_button_w + spacing_x * 2, button_h * 2,
-                              small_buttow_w, button_h, "Номер дома:", 4);
+        TableInputSort* inp_house_n = new TableInputSort(
+            *table, big_button_w + spacing_x * 2, button_h * 2, small_buttow_w,
+            button_h, "Номер дома:", 4);
 
-        SortByInput* inp_flat = new SortByInput(
-            table, big_button_w + spacing_x * 3 + small_buttow_w, button_h * 2,
+        TableInputSort* inp_flat = new TableInputSort(
+            *table, big_button_w + spacing_x * 3 + small_buttow_w, button_h * 2,
             small_buttow_w, button_h, "Квартира: ", 5);
 
         DescButton* descB = new DescButton(
@@ -76,7 +56,7 @@ int main()
         std::cout << "Exception: " << err.what() << std::endl;
     }
     catch (...) {
-        std::cout << "Unknown " << sw->errMesg();
+        std::cout << "Unknown exception: " << sw->errMesg();
     }
     return Fl::run();
 }
