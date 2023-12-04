@@ -92,13 +92,22 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
 
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
     val = converter.to_bytes(result);
-    std::cout << val << std::endl;
+    // std::cout << val << std::endl;
 
     if (invert) { invert_comd = "DESC"; }
-
-    sort_query = "SELECT * FROM main." + table_name + " WHERE "
-                 + col_name_vec[where_col] + " GLOB '*" + val
-                 + "*\' COLLATE UNICODE "
+    input_values[where_col] = val;
+    std::string where = " WHERE ";
+    for (int i = 1; i <= getColCount(); i++) {
+        where += col_name_vec[i];
+        where += " GLOB '*";
+        where += input_values[i];
+        where += "*'";
+        if (i == getColCount()) break;
+        where += " AND ";
+    };
+    std::cout << "WHERE   " << where << "\n";
+    sort_query = "SELECT * FROM main." + table_name + where
+                 + " COLLATE UNICODE "
                    "ORDER BY "
                  + col_name_vec[order_col] + " " + invert_comd
                  + " LIMIT 0, 49999;";
@@ -117,6 +126,7 @@ void SQLiteWrapper::setRowCount()
 {
     prepare(count_query);
     if (step()) { row_count = copyColInt(0); }
+    input_values.resize(row_count);
 }
 
 void SQLiteWrapper::setColNames()

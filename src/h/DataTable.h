@@ -35,7 +35,7 @@ public:
         : MainTable(x, y, w, h, l, sw->getColCount()), sw(sw),
           active_cols(new bool[sw->getColCount()]),
           active_rows(new bool[sw->getRowCount()]{}),
-          input_values(sw->getColCount())
+          input_values(sw->getColCount() + 1)
     {
         for (int c = 0; c < sw->getColCount(); c++) {
             col_width(c, set_col_w(c));
@@ -58,6 +58,12 @@ public:
         if (input) {
             inp_val.val = val;
             inp_val.col = c;
+            input_values[c - 1] = val;
+        }
+
+        std::cout << sw->getColCount() << "\n";
+        for (int i = 0; i < sw->getColCount(); i++) {
+            std::cout << i << ":  " << input_values[i] << "\n";
         }
 
         for (int i = 0; i < sw->getColCount(); i++) {
@@ -308,6 +314,7 @@ private:
         int col;
         std::string val;
     };
+    std::vector<input_value> inp_val_vec;
     input_value inp_val;
     bool invert_temp;
 public:

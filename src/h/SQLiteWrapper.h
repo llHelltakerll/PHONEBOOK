@@ -69,6 +69,7 @@ private:
     int col_count = 0;
 
     std::vector<std::string> col_name_vec;
+    std::vector<std::string> input_values;
 
     std::string table_name;
     std::string sort_query;
