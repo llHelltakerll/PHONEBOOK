@@ -73,21 +73,21 @@ public:
         if (val.empty() && inp_val.val.empty()) {
             if (active_col == 0 && c == 0) { sw->sortBy(0, val, active_col); }
             else {
-                sw->sortBy(c, val, active_col, invert_temp);
+                sw->sortBy(c, input_values[c - 1], active_col, invert_temp);
             }
         }
         else if (!inp_val.val.empty()) {
             if (active_col == 0 && c == 0) {
-                sw->sortBy(inp_val.col, inp_val.val, active_col, invert_temp);
+                sw->sortBy(c, input_values[c - 1], active_col, invert_temp);
             }
             else {
-                sw->sortBy(inp_val.col, inp_val.val, active_col, invert_temp);
+                sw->sortBy(c, input_values[c - 1], active_col, invert_temp);
             }
         }
-        else {
-            inp_val.val = val;
-            inp_val.col = c;
-        }
+        // else {
+        //     inp_val.val = val;
+        //     inp_val.col = c;
+        // }
         init_table_info();
         redraw();
         return;
