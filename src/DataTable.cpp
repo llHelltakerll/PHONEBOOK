@@ -15,6 +15,8 @@ DataTable::DataTable(int x, int y, int w, int h, SQLiteWrapper*& sw,
     col_header_height(header_col_h);
     col_resize(false); // enable column resizing
 
+    init_table_info();
+
     for (int c = 0; c < sw->getColCount(); c++) { col_width(c, set_col_w(c)); }
     this->callback(&event_callback, (void*)this); // setup callback
     this->when(FL_WHEN_CHANGED);
@@ -34,11 +36,6 @@ void DataTable::sort(int c, std::string val, bool input)
         inp_val.val = val;
         inp_val.col = c;
         input_values[c - 1] = val;
-    }
-
-    std::cout << sw->getColCount() << "\n";
-    for (int i = 0; i < sw->getColCount(); i++) {
-        std::cout << i << ":  " << input_values[i] << "\n";
     }
 
     for (int i = 0; i < sw->getColCount(); i++) {
@@ -244,7 +241,6 @@ void DataTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
         return;
     case CONTEXT_CELL:
         fl_font(FL_HELVETICA, cell_font);
-        init_table_info();
         set_col(COL, ROW, X + 1, Y, W, H);
         return;
 
@@ -253,7 +249,6 @@ void DataTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
             col_width(c, set_col_w(c));
         }
         return;
-    case CONTEXT_ENDPAGE:
     default:
         return;
     }

@@ -6,6 +6,8 @@ class TableInputSort : public OFLInput {
 public:
     TableInputSort(DataTable& table, int x, int y, int w, int h,
                    const char* lb = "", int sort = 0);
+
+    void clear();
 private:
     virtual void SortByVal() const;
     void Input() override;

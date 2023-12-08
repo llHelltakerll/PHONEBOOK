@@ -103,7 +103,6 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
         if (i == getColCount()) break;
         where += " AND ";
     };
-    std::cout << "WHERE   " << where << "\n";
     sort_query = "SELECT * FROM main." + table_name + where
                  + " COLLATE UNICODE "
                    "ORDER BY "
@@ -117,7 +116,7 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
     //                  + col_name_vec[order_col] + "\" ASC LIMIT 0, 49999";
     // }
     std::setlocale(LC_CTYPE, previousLocale);
-    std::cout << sort_query << "\n";
+    // std::cout << sort_query << "\n";
     prepare(sort_query);
 }
 void SQLiteWrapper::setRowCount()

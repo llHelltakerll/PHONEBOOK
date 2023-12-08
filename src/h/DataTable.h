@@ -39,6 +39,21 @@ public:
     void sort(int c, std::string val = "", bool input = false);
 
     void setInvert(bool invert);
+
+    int getActiveRow()
+    {
+        int active_col{};
+        for (int i = 0; i < sw->getRowCount(); i++) {
+            if (active_rows[i] == true) { return i; }
+        }
+        return -1;
+    }
+
+    void insert(std::string insert_val)
+    {
+        sw->insert(insert_val);
+        redraw();
+    }
 private:
     void init_table_info();
 
@@ -75,8 +90,10 @@ private:
         std::string flat = " ";
     };
 
-    bool* active_cols;
+    // std::vector<bool> active_cols;
+    // std::vector<bool> active_rows;
     bool* active_rows;
+    bool* active_cols;
     int rows_count;
     std::vector<db_rows> info_rows;
     std::vector<std::string> input_values;

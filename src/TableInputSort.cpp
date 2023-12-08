@@ -12,3 +12,8 @@ void TableInputSort::Input()
 {
     SortByVal();
 }
+
+void TableInputSort::clear()
+{
+    value("");
+}
