@@ -108,18 +108,19 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
                    "ORDER BY "
                  + col_name_vec[order_col] + " " + invert_comd
                  + " LIMIT 0, 49999;";
-    // }
-    // else {
-    //     sort_query = "SELECT * FROM \"main\".\"" + table_name
-    //                  + "\"  ORDER BY "
-    //                    "\""
-    //                  + col_name_vec[order_col] + "\" ASC LIMIT 0, 49999";
-    // }
     std::setlocale(LC_CTYPE, previousLocale);
     // std::cout << sort_query << "\n";
     prepare(sort_query);
+    setPrevQuery(sort_query);
+}
+
+void SQLiteWrapper::doPrevQuary()
+{
+    if (prev_query.empty()) { sortBy(0); }
+    prepare(prev_query);
 }
 void SQLiteWrapper::setRowCount()
+
 {
     prepare(count_query);
     if (step()) { row_count = copyColInt(0); }
@@ -132,7 +133,7 @@ void SQLiteWrapper::setColNames()
         = "PRAGMA table_info(" + std::string(table_name) + ")";
     prepare(pragmaQuery);
 
-    while (step()) { col_name_vec.push_back(getColText(1)); }
+    for (int i = 0; step();) { col_name_vec.push_back(getColText(1)); }
 
     final();
 }
@@ -159,11 +160,10 @@ void SQLiteWrapper::insert(std::string cells_name)
     }
     cols_name[cols_name.size() - 2] = ' ';
     std::cout << cols_name;
-    std::string insert_data_query
-        = "INSERT INTO " + table_name + " (ID, " + cols_name + ") VALUES ("
-          + std::to_string(getRowCount() + 1) + ", " + cells_name
-          + ""
-            ");";
+    std::string insert_data_query = "INSERT INTO " + table_name + " ("
+                                    + cols_name + " ) VALUES (" + cells_name
+                                    + ""
+                                      ");";
     std::cout << insert_data_query << "\n";
     exec(insert_data_query);
     setRowCount();

@@ -23,6 +23,8 @@ public:
 
     void exec(std::string query);
 
+    void doPrevQuary();
+
     void deleteById(int id);
 
     void prepare(std::string comd);
@@ -55,6 +57,8 @@ private:
     };
     void setRowCount();
 
+    void setPrevQuery(std::string query) { prev_query = query; }
+
     std::string addQuotesAndCommas(const std::string& input);
 
     void setColNames();
@@ -69,6 +73,7 @@ private:
     std::vector<std::string> col_name_vec;
     std::vector<std::string> input_values;
 
+    std::string prev_query;
     std::string table_name;
     std::string sort_query;
     std::string count_query = "SELECT COUNT(*) FROM main." + table_name;

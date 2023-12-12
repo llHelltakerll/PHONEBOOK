@@ -52,8 +52,33 @@ public:
     void insert(std::string insert_val)
     {
         sw->insert(insert_val);
+        sw->doPrevQuary();
+        active_rows[getActiveRow()] = false;
+        init_table_info();
         redraw();
     }
+
+    void deleteById()
+    {
+        sw->deleteById(std::atoi(info_rows[getActiveRow()].id.c_str()));
+        sw->doPrevQuary();
+        active_rows[getActiveRow()] = false;
+        init_table_info();
+        redraw();
+    }
+
+    void update(std::vector<std::string> upd_vals)
+    {
+        for (int i = 0; i < sw->getColCount(); i++) {
+            sw->update(std::atoi(info_rows[getActiveRow()].id.c_str()), i,
+                       upd_vals[i]);
+        }
+    }
+    std::string getNumberByRow(int r) { return info_rows[r].number; }
+    std::string getFNByRow(int r) { return info_rows[r].full_name; }
+    std::string getStreetByRow(int r) { return info_rows[r].street; }
+    std::string getHNByRow(int r) { return info_rows[r].house_number; }
+    std::string getFlatByRow(int r) { return info_rows[r].flat; }
 private:
     void init_table_info();
 

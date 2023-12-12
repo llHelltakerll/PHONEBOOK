@@ -25,7 +25,9 @@ public:
     ClearInputButton(std::vector<Fl_Input*>& inp_vec, int x, int y, int w,
                      int h, const char* l = "")
         : OFLButton(x, y, w, h, l), inp_vec(inp_vec)
-    {}
+    {
+        labelsize(11);
+    }
 
     void Press() override { clearInputs(); };
     void clearInputs()
@@ -34,6 +36,20 @@ public:
     }
 private:
     std::vector<Fl_Input*>& inp_vec;
+};
+
+class DeleteButton : public OFLButton {
+public:
+    DeleteButton(DataTable*& table, int x, int y, int w, int h,
+                 const char* l = "")
+        : OFLButton(x, y, w, h, l), table(table)
+
+    {}
+
+    void Press() override { deleteField(); };
+    void deleteField() { table->deleteById(); }
+private:
+    DataTable*& table;
 };
 
 class ConfirmButton : public OFLButton {
@@ -53,16 +69,33 @@ private:
     DataTable*& table;
 };
 
-class ChangeWindow : Fl_Window {
+class OFLWindow : public Fl_Window {
 public:
-    ChangeWindow(DataTable*& table, int x, int y, int w, int h, const char* l)
-        : Fl_Window(x, y, w, h, l), table(table)
+    OFLWindow(int x, int y, int w, int h, const char* l)
+        : Fl_Window(x, y, w, h, l)
     {
         callback(windowCallback);
+    }
+    virtual ~OFLWindow(){};
+    virtual void Interaction() = 0;
+private:
+    static void windowCallback(Fl_Widget* w, void* data)
+    {
+        OFLWindow* a_w = reinterpret_cast<OFLWindow*>(w);
+        a_w->Interaction();
+    }
+};
+
+class InsertWindow : public OFLWindow {
+public:
+    InsertWindow(DataTable*& table, int x, int y, int w, int h, const char* l)
+        : OFLWindow(x, y, w, h, l), table(table)
+    {
         begin();
         conf_but
             = new ConfirmButton(this, table, 150, 10, 80, 30, "Подтвердить");
         number_inp = new Fl_Input(0, 10, 100, 30, "телефон:");
+        number_inp->value("+ 7 ");
         full_name_inp = new Fl_Input(0, 50, 100, 30, "фио:");
         street_inp = new Fl_Input(0, 90, 100, 30, "улица:");
         house_inp = new Fl_Input(0, 130, 100, 30, "дом:");
@@ -71,7 +104,7 @@ public:
         show();
         end();
     }
-    ~ChangeWindow()
+    virtual ~InsertWindow()
     {
         delete conf_but;
         delete number_inp;
@@ -83,6 +116,47 @@ public:
 
     void insertInpValues()
     {
+        std::vector<std::string> val_vec;
+        val_vec[0] = number_inp->value();
+        val_vec[1] += full_name_inp->value();
+        val_vec[2] += street_inp->value();
+        val_vec[3] += house_inp->value();
+        val_vec[4] += flat_inp->value();
+        table->update(val_vec);
+    }
+private:
+    void Interaction() override
+    {
+        hide();
+        if (Fl::event() == FL_CLOSE) { Fl::delete_widget(this); }
+        else {
+            insertInpValues();
+        }
+    }
+protected:
+    Fl_Input* number_inp;
+    Fl_Input* full_name_inp;
+    Fl_Input* street_inp;
+    Fl_Input* house_inp;
+    Fl_Input* flat_inp;
+    DataTable*& table;
+    ConfirmButton* conf_but;
+};
+
+class UpdateWindow : public InsertWindow {
+public:
+    UpdateWindow(DataTable*& table, int x, int y, int w, int h, const char* l)
+        : InsertWindow(table, x, y, w, h, l)
+    {
+        number_inp->value(table->getNumberByRow(table->getActiveRow()).c_str());
+        full_name_inp->value(table->getFNByRow(table->getActiveRow()).c_str());
+        street_inp->value(table->getStreetByRow(table->getActiveRow()).c_str());
+        house_inp->value(table->getHNByRow(table->getActiveRow()).c_str());
+        flat_inp->value(table->getFlatByRow(table->getActiveRow()).c_str());
+    }
+
+    void updateInpValues()
+    {
         std::string insert_val;
         insert_val += number_inp->value();
         insert_val += " ";
@@ -93,29 +167,22 @@ public:
         insert_val += house_inp->value();
         insert_val += " ";
         insert_val += flat_inp->value();
-        table->insert(insert_val);
+        std::cout << insert_val << "\n";
     }
 private:
-    static void windowCallback(Fl_Widget* widget, void* data)
+    void Interaction() override
     {
-        ChangeWindow* window = static_cast<ChangeWindow*>(widget);
-        window->hide();
-        window->insertInpValues();
-
-        if (Fl::event() == FL_CLOSE) { Fl::delete_widget(window); }
+        hide();
+        if (Fl::event() == FL_CLOSE) { Fl::delete_widget(this); }
+        else {
+            insertInpValues();
+        }
     }
-public:
-    Fl_Input* number_inp;
-    Fl_Input* full_name_inp;
-    Fl_Input* street_inp;
-    Fl_Input* house_inp;
-    Fl_Input* flat_inp;
-    DataTable*& table;
-    ConfirmButton* conf_but;
 };
-class ChangeButton : public OFLButton {
+
+class InsertButton : public OFLButton {
 public:
-    ChangeButton(DataTable*& table, int x, int y, int w, int h,
+    InsertButton(DataTable*& table, int x, int y, int w, int h,
                  const char* l = "")
         : OFLButton(x, y, w, h, l), table(table)
     {}
@@ -123,13 +190,12 @@ public:
     void Press() override { CreateWin(); };
     void CreateWin()
     {
-        if ((active_row = table->getActiveRow()) == -1) return;
         std::cout << active_row << "\n";
-        win = new ChangeWindow(table, 0, 0, 500, 200, "Маленькое окно");
+        win = new InsertWindow(table, 0, 0, 500, 200, "Маленькое окно");
     }
 private:
 private:
-    ChangeWindow* win;
+    InsertWindow* win;
     DataTable*& table;
     int active_row;
 };

@@ -59,9 +59,13 @@ int main()
             = {inp_p_number, inp_full_name, inp_street, inp_house_n, inp_flat};
 
         ClearInputButton* but
-            = new ClearInputButton(inp_vec, 150, 10, 80, 30, "Clear");
+            = new ClearInputButton(inp_vec, 150, 10, 80, 30, "Очистить\nввод");
 
-        ChangeButton* cbut = new ChangeButton(table, 500, 10, 80, 30, "Change");
+        InsertButton* ibut
+            = new InsertButton(table, 500, 10, 80, 30, "Добавить");
+
+        DeleteButton* dbut
+            = new DeleteButton(table, 800, 10, 80, 30, "Удалить");
 
         DescButton* descB = new DescButton(
             table, big_button_w + spacing_x * 4 + 200 * 2, button_h * 3,
