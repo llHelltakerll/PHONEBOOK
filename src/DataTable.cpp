@@ -1,4 +1,7 @@
 #include "h/DataTable.h"
+#include "h/Button.h"
+#include <FL/Enumerations.H>
+#include <FL/fl_draw.H>
 
 DataTable::DataTable(int x, int y, int w, int h, SQLiteWrapper*& sw,
                      const char* l)
@@ -16,6 +19,7 @@ DataTable::DataTable(int x, int y, int w, int h, SQLiteWrapper*& sw,
     col_resize(false); // enable column resizing
 
     init_table_info();
+    sort(1);
 
     for (int c = 0; c < sw->getColCount(); c++) { col_width(c, set_col_w(c)); }
     this->callback(&event_callback, (void*)this); // setup callback
@@ -125,11 +129,12 @@ void DataTable::push_row_callback()
 void DataTable::DrawHeaderCol(std::string s, int X, int Y, int W, int H,
                               bool is_pressed)
 {
+    Fl_Color darkGrayColor = fl_rgb_color(160, 160, 160);
     if (is_pressed) {
-        fl_draw_box(FL_THIN_DOWN_BOX, X, Y, W, H, row_header_color());
+        fl_draw_box(FL_THIN_DOWN_BOX, X, Y, W, H, darkGrayColor);
     }
     else {
-        fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, row_header_color());
+        fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, darkGrayColor);
     }
 
     redraw();
@@ -146,7 +151,7 @@ void DataTable::DrawData(const char* s, int X, int Y, int W, int H)
     fl_color(FL_WHITE);
     fl_rectf(X, Y, W, H);
     fl_color(FL_GRAY0);
-    fl_draw(s, X, Y, W, H, FL_ALIGN_LEFT);
+    fl_draw(s, X + 5, Y, W, H, FL_ALIGN_LEFT);
     fl_color(color());
     fl_rect(X, Y, W, H);
     fl_pop_clip();
@@ -172,7 +177,33 @@ void DataTable::set_col(int COL, int ROW, int X, int Y, int W, int H)
         break;
     }
 }
+void DataTable::insertField(std::vector<std::string> insert_val)
+{
+    if (sw->insert(insert_val) == 1) {
+        ErrorOkWindow* err_win
+            = new ErrorOkWindow(0, 0, 500, 200, "Error window");
+    }
+    sw->doPrevQuary();
+    active_rows[getActiveRow()] = false;
+    init_table_info();
+    redraw();
+}
 
+void DataTable::updateField(std::vector<std::string> upd_vals)
+{
+    for (int i = 1; i <= sw->getColCount(); i++) {
+        if (sw->update(std::atoi(info_rows[getActiveRow()].id.c_str()), i,
+                       upd_vals[i])
+            == 1) {
+            ErrorOkWindow* err_win
+                = new ErrorOkWindow(0, 0, 500, 200, "Error window");
+        };
+    }
+    sw->doPrevQuary();
+    active_rows[getActiveRow()] = false;
+    init_table_info();
+    redraw();
+}
 void DataTable::DrawHeaderRow(const char* s, int X, int Y, int W, int H)
 {
     redraw(); // for more accurate title images and automaticly set
@@ -218,6 +249,7 @@ std::string DataTable::getHeaderColName(int C) const
     return "";
 }
 
+Fl_Color darkGrayColor = fl_rgb_color(160, 160, 160);
 void DataTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
                           int W, int H)
 {
@@ -231,11 +263,11 @@ void DataTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
     case CONTEXT_ROW_HEADER:
         fl_font(FL_COURIER_BOLD, header_r_font);
         if (active_rows[ROW] == false) {
-            fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, row_header_color());
+            fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, darkGrayColor);
             DrawHeaderRow("", X, Y, W, H);
         }
         else {
-            fl_draw_box(FL_THIN_DOWN_BOX, X, Y, W, H, row_header_color());
+            fl_draw_box(FL_THIN_DOWN_BOX, X, Y, W, H, darkGrayColor);
             DrawHeaderRow("@>", X, Y, W, H);
         }
         return;

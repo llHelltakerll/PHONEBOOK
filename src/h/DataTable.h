@@ -49,14 +49,7 @@ public:
         return -1;
     }
 
-    void insert(std::string insert_val)
-    {
-        sw->insert(insert_val);
-        sw->doPrevQuary();
-        active_rows[getActiveRow()] = false;
-        init_table_info();
-        redraw();
-    }
+    void insertField(std::vector<std::string> insert_val);
 
     void deleteById()
     {
@@ -67,13 +60,10 @@ public:
         redraw();
     }
 
-    void update(std::vector<std::string> upd_vals)
-    {
-        for (int i = 0; i < sw->getColCount(); i++) {
-            sw->update(std::atoi(info_rows[getActiveRow()].id.c_str()), i,
-                       upd_vals[i]);
-        }
-    }
+    void refreshTable() { sort(inp_val.col, "", true); }
+
+    void updateField(std::vector<std::string> upd_vals);
+
     std::string getNumberByRow(int r) { return info_rows[r].number; }
     std::string getFNByRow(int r) { return info_rows[r].full_name; }
     std::string getStreetByRow(int r) { return info_rows[r].street; }
@@ -107,12 +97,12 @@ private:
                    int H) override;
 private:
     struct db_rows {
-        std::string id = " ";
-        std::string number = " ";
-        std::string full_name = " ";
-        std::string street = " ";
-        std::string house_number = " ";
-        std::string flat = " ";
+        std::string id;
+        std::string number;
+        std::string full_name;
+        std::string street;
+        std::string house_number;
+        std::string flat;
     };
 
     // std::vector<bool> active_cols;
@@ -123,7 +113,7 @@ private:
     std::vector<db_rows> info_rows;
     std::vector<std::string> input_values;
     struct input_value {
-        int col;
+        int col = 1;
         std::string val;
     };
     std::vector<input_value> inp_val_vec;

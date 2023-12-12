@@ -17,11 +17,13 @@ public:
 
     const char* errMesg();
 
-    void insert(std::string cells_name);
+    int insert(std::vector<std::string> vec_str);
 
-    void update(int id, int col, std::string str);
+    bool recordExists(std::string& query);
 
-    void exec(std::string query);
+    int update(int id, int col, std::string str);
+
+    int exec(const std::string& query);
 
     void doPrevQuary();
 

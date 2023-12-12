@@ -10,6 +10,7 @@ public:
         : Fl_Button(x, y, w, h, l)
     {
         callback(CallbackFunc, 0);
+        clear_visible_focus();
     };
     virtual void Press() = 0;
 protected:
@@ -22,19 +23,19 @@ protected:
 
 class ClearInputButton : public OFLButton {
 public:
-    ClearInputButton(std::vector<Fl_Input*>& inp_vec, int x, int y, int w,
-                     int h, const char* l = "")
-        : OFLButton(x, y, w, h, l), inp_vec(inp_vec)
-    {
-        labelsize(11);
-    }
+    ClearInputButton(std::vector<Fl_Input*>& inp_vec, DataTable*& table, int x,
+                     int y, int w, int h, const char* l = "")
+        : OFLButton(x, y, w, h, l), inp_vec(inp_vec), table(table)
+    {}
 
     void Press() override { clearInputs(); };
     void clearInputs()
     {
         for (Fl_Input* input: inp_vec) { input->value(""); }
+        table->refreshTable();
     }
 private:
+    DataTable*& table;
     std::vector<Fl_Input*>& inp_vec;
 };
 
@@ -47,26 +48,30 @@ public:
     {}
 
     void Press() override { deleteField(); };
-    void deleteField() { table->deleteById(); }
+    void deleteField()
+    {
+        if (table->getActiveRow() == -1) return;
+        table->deleteById();
+    }
 private:
     DataTable*& table;
 };
 
 class ConfirmButton : public OFLButton {
 public:
-    ConfirmButton(Fl_Window* win, DataTable*& table, int x, int y, int w, int h,
+    ConfirmButton(Fl_Window* win, int x, int y, int w, int h,
                   const char* l = "")
-        : OFLButton(x, y, w, h, l), win(win), table(table)
+        : OFLButton(x, y, w, h, l), win(win)
     {}
     void Press() override { Confirm(); };
     void Confirm()
     {
         win->do_callback();
+        std::cout << "DELETE WIN\n\n";
         Fl::delete_widget(win);
     }
 private:
     Fl_Window* win;
-    DataTable*& table;
 };
 
 class OFLWindow : public Fl_Window {
@@ -86,14 +91,46 @@ private:
     }
 };
 
+class ErrorOkWindow : public OFLWindow {
+public:
+    ErrorOkWindow(int x, int y, int w, int h, const char* l)
+        : OFLWindow(x, y, w, h, l)
+    {
+        begin();
+        label = new Fl_Box(150, 50, 260, 100,
+                           "Ошибка! Введен дубликат номера телефона");
+        conf_but = new ConfirmButton(this, 150, 10, 80, 30, "Ok");
+        set_modal();
+        show();
+        end();
+    };
+
+    ~ErrorOkWindow()
+    {
+        std::cout << "DELETE WIN\n";
+        delete conf_but;
+        delete label;
+    }
+    void Interaction() override
+    {
+        hide();
+        if (Fl::event() == FL_CLOSE) {
+            std::cout << "DEL BY CLOSE\n";
+            Fl::delete_widget(this);
+        }
+    }
+private:
+    ConfirmButton* conf_but;
+    Fl_Box* label;
+};
+
 class InsertWindow : public OFLWindow {
 public:
     InsertWindow(DataTable*& table, int x, int y, int w, int h, const char* l)
         : OFLWindow(x, y, w, h, l), table(table)
     {
         begin();
-        conf_but
-            = new ConfirmButton(this, table, 150, 10, 80, 30, "Подтвердить");
+        conf_but = new ConfirmButton(this, 150, 10, 80, 30, "Подтвердить");
         number_inp = new Fl_Input(0, 10, 100, 30, "телефон:");
         number_inp->value("+ 7 ");
         full_name_inp = new Fl_Input(0, 50, 100, 30, "фио:");
@@ -104,6 +141,7 @@ public:
         show();
         end();
     }
+
     virtual ~InsertWindow()
     {
         delete conf_but;
@@ -116,17 +154,27 @@ public:
 
     void insertInpValues()
     {
-        std::vector<std::string> val_vec;
-        val_vec[0] = number_inp->value();
-        val_vec[1] += full_name_inp->value();
-        val_vec[2] += street_inp->value();
-        val_vec[3] += house_inp->value();
-        val_vec[4] += flat_inp->value();
-        table->update(val_vec);
+        std::vector<std::string> val_vec(table->sw->getRowCount());
+        val_vec[1] = number_inp->value();
+        val_vec[2] = full_name_inp->value();
+        val_vec[3] = street_inp->value();
+        val_vec[4] = house_inp->value();
+        val_vec[5] = flat_inp->value();
+        table->insertField(val_vec);
     }
 private:
     void Interaction() override
     {
+        std::string number_inp_str = number_inp->value();
+        std::string full_name_inp_str = full_name_inp->value();
+        std::string street_inp_str = street_inp->value();
+        std::string house_inp_str = house_inp->value();
+        std::string flat_inp_str = flat_inp->value();
+        // if (number_inp_str.empty() || full_name_inp_str.empty()
+        //     || street_inp_str.empty() || house_inp_str.empty()
+        //     || flat_inp_str.empty()) {
+        //     return;
+        // };
         hide();
         if (Fl::event() == FL_CLOSE) { Fl::delete_widget(this); }
         else {
@@ -157,17 +205,13 @@ public:
 
     void updateInpValues()
     {
-        std::string insert_val;
-        insert_val += number_inp->value();
-        insert_val += " ";
-        insert_val += full_name_inp->value();
-        insert_val += " ";
-        insert_val += street_inp->value();
-        insert_val += " ";
-        insert_val += house_inp->value();
-        insert_val += " ";
-        insert_val += flat_inp->value();
-        std::cout << insert_val << "\n";
+        std::vector<std::string> val_vec(table->sw->getRowCount());
+        val_vec[1] = number_inp->value();
+        val_vec[2] = full_name_inp->value();
+        val_vec[3] = street_inp->value();
+        val_vec[4] = house_inp->value();
+        val_vec[5] = flat_inp->value();
+        table->updateField(val_vec);
     }
 private:
     void Interaction() override
@@ -175,9 +219,29 @@ private:
         hide();
         if (Fl::event() == FL_CLOSE) { Fl::delete_widget(this); }
         else {
-            insertInpValues();
+            updateInpValues();
         }
     }
+};
+class UpdateButton : public OFLButton {
+public:
+    UpdateButton(DataTable*& table, int x, int y, int w, int h,
+                 const char* l = "")
+        : OFLButton(x, y, w, h, l), table(table)
+    {}
+
+    void Press() override { CreateWin(); };
+    void CreateWin()
+    {
+        if (table->getActiveRow() == -1) { return; }
+        std::cout << active_row << "\n";
+        win = new UpdateWindow(table, 0, 0, 500, 200, "Изменение");
+    }
+private:
+private:
+    InsertWindow* win;
+    DataTable*& table;
+    int active_row;
 };
 
 class InsertButton : public OFLButton {

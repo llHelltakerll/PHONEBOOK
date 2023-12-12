@@ -90,7 +90,6 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
 
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
     val = converter.to_bytes(result);
-    // std::cout << val << std::endl;
 
     if (invert) { invert_comd = "DESC"; }
     input_values[where_col] = val;
@@ -105,11 +104,11 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
     };
     sort_query = "SELECT * FROM main." + table_name + where
                  + " COLLATE UNICODE "
-                   "ORDER BY "
-                 + col_name_vec[order_col] + " " + invert_comd
+                   "ORDER BY TRIM("
+                 + col_name_vec[order_col] + ") " + invert_comd
                  + " LIMIT 0, 49999;";
     std::setlocale(LC_CTYPE, previousLocale);
-    // std::cout << sort_query << "\n";
+    std::cout << sort_query << "\n";
     prepare(sort_query);
     setPrevQuery(sort_query);
 }
@@ -151,46 +150,73 @@ std::string SQLiteWrapper::addQuotesAndCommas(const std::string& input)
     return result;
 }
 
-void SQLiteWrapper::insert(std::string cells_name)
+int SQLiteWrapper::insert(std::vector<std::string> cells_name)
 {
-    cells_name = addQuotesAndCommas(cells_name);
+    // Предполагается, что col_name_vec содержит имена столбцов таблицы
     std::string cols_name;
     for (int i = 1; i < col_name_vec.size(); i++) {
         cols_name += col_name_vec[i] + ", ";
     }
     cols_name[cols_name.size() - 2] = ' ';
-    std::cout << cols_name;
-    std::string insert_data_query = "INSERT INTO " + table_name + " ("
-                                    + cols_name + " ) VALUES (" + cells_name
-                                    + ""
-                                      ");";
-    std::cout << insert_data_query << "\n";
-    exec(insert_data_query);
-    setRowCount();
-}
 
-void SQLiteWrapper::update(int id, int col, std::string str)
+    // Формируем SQL-запрос
+    std::string insertDataQuery
+        = "INSERT INTO " + table_name + " (" + cols_name + ") VALUES ('"
+          + cells_name[1] + "', '" + cells_name[2] + "', '" + cells_name[3]
+          + "', '" + cells_name[4] + "', '" + cells_name[5] + "');";
+
+    std::cout << insertDataQuery << "\n";
+
+    // Выполняем SQL-запрос
+    int result = exec(insertDataQuery);
+
+    // Обрабатываем результат выполнения
+    if (result == SQLITE_CONSTRAINT) {
+        std::cerr << "Duplicate phone number. Handle the duplicate entry."
+                  << std::endl;
+        return 1;
+    }
+    else if (result != SQLITE_OK) {
+        std::cerr << "Execution failed." << std::endl;
+        return 2;
+    }
+    std::cout << "Insertion successful." << std::endl;
+    setRowCount();
+    return 0;
+}
+int SQLiteWrapper::update(int id, int col, std::string str)
 {
-    if (col == 0) {
-        std::cerr << "Can`t change id column\n";
-        return;
-    }
-    if (id > col_name_vec.size()) {
-        std::cerr << "No such id\n";
-        return;
-    }
     std::string update_query = "UPDATE " + table_name + " SET "
                                + col_name_vec[col] + " = '" + str
                                + "' WHERE "
                                  "ID = '"
                                + std::to_string(id) + "';";
-    exec(update_query);
+    int result = exec(update_query);
+
+    // Обрабатываем результат выполнения
+    if (result == SQLITE_CONSTRAINT) {
+        std::cerr << "Duplicate phone number. Handle the duplicate entry."
+                  << std::endl;
+        return 1;
+    }
+    else if (result != SQLITE_OK) {
+        std::cerr << "Execution failed." << std::endl;
+        return 2;
+    }
+    std::cout << "Insertion successful." << std::endl;
+    setRowCount();
+    return 0;
 }
 
-void SQLiteWrapper::exec(std::string query)
+int SQLiteWrapper::exec(const std::string& query)
 {
-    int rc = sqlite3_exec(db, query.c_str(), 0, 0, 0);
-    if (rc != SQLITE_OK) throw std::runtime_error(errMesg());
+    int result = sqlite3_exec(db, query.c_str(), nullptr, nullptr, nullptr);
+
+    if (result != SQLITE_OK) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+    }
+
+    return result;
 }
 
 void SQLiteWrapper::deleteById(int id)

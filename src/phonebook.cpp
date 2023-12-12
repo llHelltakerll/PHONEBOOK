@@ -58,14 +58,22 @@ int main()
         std::vector<Fl_Input*> inp_vec
             = {inp_p_number, inp_full_name, inp_street, inp_house_n, inp_flat};
 
-        ClearInputButton* but
-            = new ClearInputButton(inp_vec, 150, 10, 80, 30, "Очистить\nввод");
+        ClearInputButton* but = new ClearInputButton(
+            inp_vec, table, big_button_w + spacing_x * 3,
+            button_h + button_h / 2, small_buttow_w / 1.5, button_h,
+            "Очистить ввод");
 
-        InsertButton* ibut
-            = new InsertButton(table, 500, 10, 80, 30, "Добавить");
+        InsertButton* ibut = new InsertButton(
+            table, big_button_w + small_buttow_w / 1.5 + spacing_x * 4,
+            button_h + button_h / 2, small_buttow_w / 2, button_h, "Добавить");
 
-        DeleteButton* dbut
-            = new DeleteButton(table, 800, 10, 80, 30, "Удалить");
+        DeleteButton* dbut = new DeleteButton(
+            table, big_button_w + (small_buttow_w / 1.5) * 1.7 + spacing_x * 5,
+            button_h + button_h / 2, small_buttow_w / 2, button_h, "Удалить");
+
+        UpdateButton* ubut = new UpdateButton(
+            table, big_button_w + (small_buttow_w / 1.5) * 3 + spacing_x * 6,
+            button_h + button_h / 2, small_buttow_w / 2, button_h, "Изменить");
 
         DescButton* descB = new DescButton(
             table, big_button_w + spacing_x * 4 + 200 * 2, button_h * 3,
