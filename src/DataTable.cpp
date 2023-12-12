@@ -32,7 +32,7 @@ DataTable::~DataTable()
     delete[] active_rows;
 }
 
-void DataTable::sort(int c, std::string val, bool input)
+void DataTable::sort(int c, std::string val, bool input, bool clear_prev)
 {
     int active_col{};
 
@@ -43,21 +43,31 @@ void DataTable::sort(int c, std::string val, bool input)
     }
 
     for (int i = 0; i < sw->getColCount(); i++) {
+        std::cout << "VALUES: " << input_values[i];
+    }
+    std::cout << "\nEND\n";
+
+    for (int i = 0; i < sw->getColCount(); i++) {
         if (active_cols[i] == true) { active_col = i + 1; }
     }
 
     if (val.empty() && inp_val.val.empty()) {
-        if (active_col == 0 && c == 0) { sw->sortBy(0, val, active_col); }
+        if (active_col == 0 && c == 0) {
+            sw->sortBy(0, val, active_col, invert_temp, clear_prev);
+        }
         else {
-            sw->sortBy(c, input_values[c - 1], active_col, invert_temp);
+            sw->sortBy(c, input_values[c - 1], active_col, invert_temp,
+                       clear_prev);
         }
     }
     else if (!inp_val.val.empty()) {
         if (active_col == 0 && c == 0) {
-            sw->sortBy(c, input_values[c - 1], active_col, invert_temp);
+            sw->sortBy(c, input_values[c - 1], active_col, invert_temp,
+                       clear_prev);
         }
         else {
-            sw->sortBy(c, input_values[c - 1], active_col, invert_temp);
+            sw->sortBy(c, input_values[c - 1], active_col, invert_temp,
+                       clear_prev);
         }
     }
     init_table_info();

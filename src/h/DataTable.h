@@ -36,7 +36,8 @@ public:
 
     ~DataTable();
 
-    void sort(int c, std::string val = "", bool input = false);
+    void sort(int c, std::string val = "", bool input = false,
+              bool clear_prev = false);
 
     void setInvert(bool invert);
 
@@ -60,7 +61,11 @@ public:
         redraw();
     }
 
-    void refreshTable() { sort(inp_val.col, "", true); }
+    void refreshTable()
+    {
+        input_values.resize(sw->getColCount());
+        sort(inp_val.col, "", true, true);
+    }
 
     void updateField(std::vector<std::string> upd_vals);
 

@@ -46,7 +46,7 @@ public:
     inline std::string getColName(int c) { return col_name_vec[c]; }
 
     void sortBy(int order_col = 0, std::string val = "", int where_col = 0,
-                bool invert = false);
+                bool invert = false, bool clear = false);
 private:
     enum { max_str_len = 256 };
     struct db_rows {

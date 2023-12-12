@@ -62,8 +62,12 @@ std::string SQLiteWrapper::getColText(int col) const
 }
 
 void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
-                           bool invert)
+                           bool invert, bool clear)
 {
+    if (clear) {
+        input_values.clear();
+        input_values.resize(getColCount());
+    }
     std::string invert_comd;
     const char* previousLocale = std::setlocale(LC_CTYPE, nullptr);
     std::setlocale(LC_CTYPE, "ru_RU.UTF-8");
@@ -74,18 +78,15 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
     wbuffer[len] = L'\0';
     std::wstring wstr(wbuffer);
 
-    // Используйте другую строку для хранения результата
     std::wstring result;
 
     for (wchar_t ch: wstr) {
-        // Добавление символа в квадратные скобки
         result += L"[";
-        result += std::towupper(ch); // Приведение к нижнему регистру
-        result += std::tolower(ch); // Приведение к верхнему регистру
+        result += std::towupper(ch);
+        result += std::tolower(ch);
         result += L"]";
     }
 
-    // Освобождение буфера
     delete[] wbuffer;
 
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
