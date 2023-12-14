@@ -1,61 +1,9 @@
 #pragma once
 
+#include "OFLButton.h"
 #include "TableInputSort.h"
 #include <FL/Fl_Button.H>
 #include <vector>
-
-class OFLButton : public Fl_Button {
-public:
-    OFLButton(int x, int y, int w, int h, const char* l = "")
-        : Fl_Button(x, y, w, h, l)
-    {
-        callback(CallbackFunc, 0);
-        clear_visible_focus();
-    };
-    virtual void Press() = 0;
-protected:
-    static void CallbackFunc(Fl_Widget* w, void* user)
-    {
-        OFLButton* a_w = reinterpret_cast<OFLButton*>(w);
-        a_w->Press();
-    }
-};
-
-class ClearInputButton : public OFLButton {
-public:
-    ClearInputButton(std::vector<Fl_Input*>& inp_vec, DataTable*& table, int x,
-                     int y, int w, int h, const char* l = "")
-        : OFLButton(x, y, w, h, l), inp_vec(inp_vec), table(table)
-    {}
-
-    void Press() override { clearInputs(); };
-    void clearInputs()
-    {
-        for (Fl_Input* input: inp_vec) { input->value(""); }
-        table->refreshTable();
-    }
-private:
-    DataTable*& table;
-    std::vector<Fl_Input*>& inp_vec;
-};
-
-class DeleteButton : public OFLButton {
-public:
-    DeleteButton(DataTable*& table, int x, int y, int w, int h,
-                 const char* l = "")
-        : OFLButton(x, y, w, h, l), table(table)
-
-    {}
-
-    void Press() override { deleteField(); };
-    void deleteField()
-    {
-        if (table->getActiveRow() == -1) return;
-        table->deleteById();
-    }
-private:
-    DataTable*& table;
-};
 
 class ConfirmButton : public OFLButton {
 public:
@@ -132,7 +80,7 @@ public:
         begin();
         conf_but = new ConfirmButton(this, 150, 10, 80, 30, "Подтвердить");
         number_inp = new Fl_Input(0, 10, 100, 30, "телефон:");
-        number_inp->value("+ 7 ");
+        number_inp->value("+7 ");
         full_name_inp = new Fl_Input(0, 50, 100, 30, "фио:");
         street_inp = new Fl_Input(0, 90, 100, 30, "улица:");
         house_inp = new Fl_Input(0, 130, 100, 30, "дом:");

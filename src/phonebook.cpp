@@ -1,8 +1,10 @@
-#include "h/Button.h"
-#include "h/DataTable.h"
-#include "h/DescButton.h"
-#include "h/SQLiteWrapper.h"
-#include "h/TableInputSort.h"
+#include "include/Button.h"
+#include "include/ClearInputButton.h"
+#include "include/DataTable.h"
+#include "include/DeleteButton.h"
+#include "include/DescButton.h"
+#include "include/SQLiteWrapper.h"
+#include "include/TableInputSort.h"
 #include <FL/Fl.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Input.H>
