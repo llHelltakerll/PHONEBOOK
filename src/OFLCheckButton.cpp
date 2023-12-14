@@ -1,4 +1,4 @@
-#include "h/OFLCheckButton.h"
+#include "include/OFLCheckButton.h"
 
 OFLCheckButton::OFLCheckButton(int x, int y, int w, int h, const char* l)
     : Fl_Check_Button(x, y, w, h, l)

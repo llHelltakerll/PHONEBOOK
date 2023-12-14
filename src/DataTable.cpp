@@ -1,5 +1,5 @@
-#include "h/DataTable.h"
-#include "h/Button.h"
+#include "include/DataTable.h"
+#include "include/Button.h"
 #include <FL/Enumerations.H>
 #include <FL/fl_draw.H>
 
@@ -35,6 +35,8 @@ DataTable::~DataTable()
 void DataTable::sort(int c, std::string val, bool input, bool clear_prev)
 {
     int active_col{};
+
+    if (clear_prev) { input_values.clear(); }
 
     if (input) {
         inp_val.val = val;

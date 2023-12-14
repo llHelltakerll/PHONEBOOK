@@ -1,4 +1,4 @@
-#include "h/SQLiteWrapper.h"
+#include "include/SQLiteWrapper.h"
 
 SQLiteWrapper::SQLiteWrapper(const char* dir, std::string table_name,
                              int flags, //

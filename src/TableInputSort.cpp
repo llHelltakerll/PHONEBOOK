@@ -1,4 +1,4 @@
-#include "h/TableInputSort.h"
+#include "include/TableInputSort.h"
 
 TableInputSort::TableInputSort(DataTable& table, int x, int y, int w, int h,
                                const char* lb, int sort)

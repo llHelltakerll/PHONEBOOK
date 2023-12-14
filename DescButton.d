@@ -1,2 +1,3 @@
-obj/DescButton.o: src/DescButton.cpp src/h/DescButton.h src/h/DataTable.h \
- src/h/OFLTable.h src/h/SQLiteWrapper.h src/h/OFLCheckButton.h
+obj/DescButton.o: src/DescButton.cpp src/include/DescButton.h \
+ src/include/DataTable.h src/include/OFLTable.h \
+ src/include/SQLiteWrapper.h src/include/OFLCheckButton.h

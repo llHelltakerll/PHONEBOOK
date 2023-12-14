@@ -1,1 +1,1 @@
-obj/OFLInput.o: src/OFLInput.cpp src/h/OFLInput.h
+obj/OFLInput.o: src/OFLInput.cpp src/include/OFLInput.h

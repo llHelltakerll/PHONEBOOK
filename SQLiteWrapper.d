@@ -1,1 +1,1 @@
-obj/SQLiteWrapper.o: src/SQLiteWrapper.cpp src/h/SQLiteWrapper.h
+obj/SQLiteWrapper.o: src/SQLiteWrapper.cpp src/include/SQLiteWrapper.h
