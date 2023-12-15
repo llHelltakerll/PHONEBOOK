@@ -1,5 +1,5 @@
 #include "include/DataTable.h"
-#include "include/Button.h"
+#include "include/ErrorOkWindow.h"
 #include <FL/Enumerations.H>
 #include <FL/fl_draw.H>
 
@@ -35,6 +35,7 @@ DataTable::~DataTable()
 void DataTable::sort(int c, std::string val, bool input, bool clear_prev)
 {
     int active_col{};
+    bool cast_to_int = false;
 
     if (clear_prev) { input_values.clear(); }
 
@@ -43,6 +44,8 @@ void DataTable::sort(int c, std::string val, bool input, bool clear_prev)
         inp_val.col = c;
         input_values[c - 1] = val;
     }
+
+    if (c == 4 || c == 5) { cast_to_int = true; }
 
     for (int i = 0; i < sw->getColCount(); i++) {
         std::cout << "VALUES: " << input_values[i];
@@ -55,21 +58,22 @@ void DataTable::sort(int c, std::string val, bool input, bool clear_prev)
 
     if (val.empty() && inp_val.val.empty()) {
         if (active_col == 0 && c == 0) {
-            sw->sortBy(0, val, active_col, invert_temp, clear_prev);
+            sw->sortBy(0, val, active_col, invert_temp, clear_prev,
+                       cast_to_int);
         }
         else {
             sw->sortBy(c, input_values[c - 1], active_col, invert_temp,
-                       clear_prev);
+                       clear_prev, cast_to_int);
         }
     }
     else if (!inp_val.val.empty()) {
         if (active_col == 0 && c == 0) {
             sw->sortBy(c, input_values[c - 1], active_col, invert_temp,
-                       clear_prev);
+                       clear_prev, cast_to_int);
         }
         else {
             sw->sortBy(c, input_values[c - 1], active_col, invert_temp,
-                       clear_prev);
+                       clear_prev, cast_to_int);
         }
     }
     init_table_info();
@@ -80,7 +84,7 @@ void DataTable::sort(int c, std::string val, bool input, bool clear_prev)
 void DataTable::setInvert(bool invert)
 {
     invert_temp = invert;
-    sort(inp_val.col, inp_val.val);
+    sort(inp_val.col, input_values[inp_val.col]);
 }
 void DataTable::init_table_info()
 {
@@ -149,8 +153,6 @@ void DataTable::DrawHeaderCol(std::string s, int X, int Y, int W, int H,
         fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, darkGrayColor);
     }
 
-    redraw();
-
     fl_push_clip(X, Y, W, H);
     fl_color(FL_BLACK);
     fl_draw(s.c_str(), X, Y, W, H, FL_ALIGN_CENTER);
@@ -189,33 +191,19 @@ void DataTable::set_col(int COL, int ROW, int X, int Y, int W, int H)
         break;
     }
 }
-void DataTable::insertField(std::vector<std::string> insert_val)
-{
-    if (sw->insert(insert_val) == 1) {
-        ErrorOkWindow* err_win
-            = new ErrorOkWindow(0, 0, 500, 200, "Error window");
-    }
-    sw->doPrevQuary();
-    active_rows[getActiveRow()] = false;
-    init_table_info();
-    redraw();
-}
 
-void DataTable::updateField(std::vector<std::string> upd_vals)
+int DataTable::updateField(std::vector<std::string> upd_vals)
 {
     for (int i = 1; i <= sw->getColCount(); i++) {
         if (sw->update(std::atoi(info_rows[getActiveRow()].id.c_str()), i,
                        upd_vals[i])
-            == 1) {
-            ErrorOkWindow* err_win
-                = new ErrorOkWindow(0, 0, 500, 200, "Error window");
+            == SQLITE_CONSTRAINT) {
+            return SQLITE_CONSTRAINT;
         };
     }
-    sw->doPrevQuary();
-    active_rows[getActiveRow()] = false;
-    init_table_info();
-    redraw();
+    return SQLITE_OK;
 }
+
 void DataTable::DrawHeaderRow(const char* s, int X, int Y, int W, int H)
 {
     redraw(); // for more accurate title images and automaticly set
@@ -296,4 +284,32 @@ void DataTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
     default:
         return;
     }
+}
+
+int DataTable::getActiveRow()
+{
+    int active_col{};
+    for (int i = 0; i < sw->getRowCount(); i++) {
+        if (active_rows[i] == true) { return i; }
+    }
+    return -1;
+}
+
+void DataTable::deleteById()
+{
+    sw->deleteById(std::atoi(info_rows[getActiveRow()].id.c_str()));
+}
+
+void DataTable::refreshTable()
+{
+    input_values.resize(sw->getColCount());
+    sort(inp_val.col, "", true, true);
+}
+
+void DataTable::undoTable()
+{
+    sw->doPrevQuary();
+    active_rows[getActiveRow()] = false;
+    init_table_info();
+    redraw();
 }

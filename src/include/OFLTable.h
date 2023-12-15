@@ -7,18 +7,9 @@
 class OFLTable : public Fl_Table {
 public:
     OFLTable(int x, int y, int w, int h, const char* l = "", int c = 0,
-             int r = 0)
-        : Fl_Table(x, y, w, h, l)
-    {
-        begin();
-        rows(r);
-        row_header(true); // enable row headers (along left)
+             int r = 0);
 
-        cols(c);
-        col_header(true); // enable column headers (along top)
-        end();
-    };
-    virtual ~OFLTable(){};
+    virtual ~OFLTable() = default;
 protected:
     virtual void DrawData(const char* s, int X, int Y, int W, int H) = 0;
     virtual void DrawHeaderCol(std::string s, int X, int Y, int W, int H,

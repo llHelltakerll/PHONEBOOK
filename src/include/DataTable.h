@@ -41,39 +41,21 @@ public:
 
     void setInvert(bool invert);
 
-    int getActiveRow()
-    {
-        int active_col{};
-        for (int i = 0; i < sw->getRowCount(); i++) {
-            if (active_rows[i] == true) { return i; }
-        }
-        return -1;
-    }
+    int getActiveRow();
 
-    void insertField(std::vector<std::string> insert_val);
+    void undoTable();
 
-    void deleteById()
-    {
-        sw->deleteById(std::atoi(info_rows[getActiveRow()].id.c_str()));
-        sw->doPrevQuary();
-        active_rows[getActiveRow()] = false;
-        init_table_info();
-        redraw();
-    }
+    void deleteById();
 
-    void refreshTable()
-    {
-        input_values.resize(sw->getColCount());
-        sort(inp_val.col, "", true, true);
-    }
+    void refreshTable();
 
-    void updateField(std::vector<std::string> upd_vals);
+    int updateField(std::vector<std::string> upd_vals);
 
-    std::string getNumberByRow(int r) { return info_rows[r].number; }
-    std::string getFNByRow(int r) { return info_rows[r].full_name; }
-    std::string getStreetByRow(int r) { return info_rows[r].street; }
-    std::string getHNByRow(int r) { return info_rows[r].house_number; }
-    std::string getFlatByRow(int r) { return info_rows[r].flat; }
+    inline std::string getNumberByRow(int r) { return info_rows[r].number; }
+    inline std::string getFNByRow(int r) { return info_rows[r].full_name; }
+    inline std::string getStreetByRow(int r) { return info_rows[r].street; }
+    inline std::string getHNByRow(int r) { return info_rows[r].house_number; }
+    inline std::string getFlatByRow(int r) { return info_rows[r].flat; }
 private:
     void init_table_info();
 
@@ -110,8 +92,6 @@ private:
         std::string flat;
     };
 
-    // std::vector<bool> active_cols;
-    // std::vector<bool> active_rows;
     bool* active_rows;
     bool* active_cols;
     int rows_count;

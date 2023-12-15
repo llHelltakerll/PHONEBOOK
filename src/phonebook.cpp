@@ -1,10 +1,11 @@
-#include "include/Button.h"
 #include "include/ClearInputButton.h"
 #include "include/DataTable.h"
 #include "include/DeleteButton.h"
 #include "include/DescButton.h"
+#include "include/InsertButton.h"
 #include "include/SQLiteWrapper.h"
 #include "include/TableInputSort.h"
+#include "include/UpdateButton.h"
 #include <FL/Fl.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Input.H>
@@ -28,6 +29,7 @@ void ClearInput(Fl_Widget* button, void* data)
     Fl_Input* input = static_cast<Fl_Input*>(data);
     input->value(""); // Устанавливаем пустую строку в качестве значения
 }
+
 int main()
 {
     SQLiteWrapper* sw = nullptr;

@@ -46,17 +46,9 @@ public:
     inline std::string getColName(int c) { return col_name_vec[c]; }
 
     void sortBy(int order_col = 0, std::string val = "", int where_col = 0,
-                bool invert = false, bool clear = false);
+                bool invert = false, bool clear = false,
+                bool cast_to_int = false);
 private:
-    enum { max_str_len = 256 };
-    struct db_rows {
-        int id;
-        char number[max_str_len];
-        char full_name[max_str_len];
-        char street[max_str_len];
-        char house_number[max_str_len];
-        char flat[max_str_len];
-    };
     void setRowCount();
 
     void setPrevQuery(std::string query) { prev_query = query; }
@@ -67,7 +59,6 @@ private:
 private:
     sqlite3* db = nullptr; // дескриптор для работы с базой данных
     sqlite3_stmt* stmt;
-    std::vector<db_rows> info_rows;
 
     int row_count = 0;
     int col_count = 0;

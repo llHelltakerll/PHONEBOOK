@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DataTable.h"
+#include "ErrorOkWindow.h"
 #include "OFLButton.h"
 
 class DeleteButton : public OFLButton {
@@ -12,4 +13,5 @@ public:
     void deleteField();
 private:
     DataTable*& table;
+    ErrorOkWindow* err_win;
 };

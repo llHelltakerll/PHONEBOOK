@@ -1,3 +1,5 @@
+#pragma once
+
 #include "DataTable.h"
 #include "OFLButton.h"
 #include <FL/Fl_Input.H>

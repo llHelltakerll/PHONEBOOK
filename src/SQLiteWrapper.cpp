@@ -62,8 +62,14 @@ std::string SQLiteWrapper::getColText(int col) const
 }
 
 void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
-                           bool invert, bool clear)
+                           bool invert, bool clear, bool cast_to_int)
 {
+    std::string cast;
+    std::string as_int;
+    if (cast_to_int) {
+        cast = "CAST(";
+        as_int = " AS INTEGER)";
+    }
     if (clear) {
         input_values.clear();
         input_values.resize(getColCount());
@@ -105,8 +111,8 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
     };
     sort_query = "SELECT * FROM main." + table_name + where
                  + " COLLATE UNICODE "
-                   "ORDER BY TRIM("
-                 + col_name_vec[order_col] + ") " + invert_comd
+                   "ORDER BY ("
+                 + cast + col_name_vec[order_col] + as_int + ") " + invert_comd
                  + " LIMIT 0, 49999;";
     std::setlocale(LC_CTYPE, previousLocale);
     std::cout << sort_query << "\n";
@@ -168,23 +174,26 @@ int SQLiteWrapper::insert(std::vector<std::string> cells_name)
 
     std::cout << insertDataQuery << "\n";
 
+    std::cout << "IIIIIIIIIIIII" << std::endl;
+
     // Выполняем SQL-запрос
     int result = exec(insertDataQuery);
 
-    // Обрабатываем результат выполнения
-    if (result == SQLITE_CONSTRAINT) {
-        std::cerr << "Duplicate phone number. Handle the duplicate entry."
-                  << std::endl;
-        return 1;
-    }
-    else if (result != SQLITE_OK) {
-        std::cerr << "Execution failed." << std::endl;
-        return 2;
-    }
-    std::cout << "Insertion successful." << std::endl;
+    // // Обрабатываем результат выполнения
+    // if (result == SQLITE_CONSTRAINT) {
+    //     std::cerr << "Duplicate phone number. Handle the duplicate entry."
+    //               << std::endl;
+    //     return 1;
+    // }
+    // else if (result != SQLITE_OK) {
+    //     std::cerr << "Execution failed." << std::endl;
+    //     return 2;
+    // }
+    // std::cout << "Insertion successful." << std::endl;
     setRowCount();
-    return 0;
+    return result;
 }
+
 int SQLiteWrapper::update(int id, int col, std::string str)
 {
     std::string update_query = "UPDATE " + table_name + " SET "
@@ -195,18 +204,18 @@ int SQLiteWrapper::update(int id, int col, std::string str)
     int result = exec(update_query);
 
     // Обрабатываем результат выполнения
-    if (result == SQLITE_CONSTRAINT) {
-        std::cerr << "Duplicate phone number. Handle the duplicate entry."
-                  << std::endl;
-        return 1;
-    }
-    else if (result != SQLITE_OK) {
-        std::cerr << "Execution failed." << std::endl;
-        return 2;
-    }
-    std::cout << "Insertion successful." << std::endl;
+    // if (result == SQLITE_CONSTRAINT) {
+    //     std::cerr << "Duplicate phone number. Handle the duplicate entry."
+    //               << std::endl;
+    //     return 1;
+    // }
+    // else if (result != SQLITE_OK) {
+    //     std::cerr << "Execution failed." << std::endl;
+    //     return 2;
+    // }
+    // std::cout << "Insertion successful." << std::endl;
     setRowCount();
-    return 0;
+    return result;
 }
 
 int SQLiteWrapper::exec(const std::string& query)
