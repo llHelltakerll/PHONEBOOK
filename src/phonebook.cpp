@@ -24,12 +24,6 @@ enum {
 
 enum { table_w = 1380, table_h = 480, table_x = 10, table_y = win_y - 150 };
 
-void ClearInput(Fl_Widget* button, void* data)
-{
-    Fl_Input* input = static_cast<Fl_Input*>(data);
-    input->value(""); // Устанавливаем пустую строку в качестве значения
-}
-
 int main()
 {
     SQLiteWrapper* sw = nullptr;
@@ -62,22 +56,26 @@ int main()
         std::vector<Fl_Input*> inp_vec
             = {inp_p_number, inp_full_name, inp_street, inp_house_n, inp_flat};
 
-        ClearInputButton* but = new ClearInputButton(
+        ClearInputButton* cbut = new ClearInputButton(
             inp_vec, table, big_button_w + spacing_x * 3,
-            button_h + button_h / 2, small_buttow_w / 1.5, button_h,
+            button_h + button_h / 2 - 3, small_buttow_w / 1.5, button_h,
             "Очистить ввод");
 
         InsertButton* ibut = new InsertButton(
             table, big_button_w + small_buttow_w / 1.5 + spacing_x * 4,
-            button_h + button_h / 2, small_buttow_w / 2, button_h, "Добавить");
+            button_h + button_h / 2 - 3, small_buttow_w / 2, button_h,
+            "Добавить");
 
         DeleteButton* dbut = new DeleteButton(
-            table, big_button_w + (small_buttow_w / 1.5) * 1.7 + spacing_x * 5,
-            button_h + button_h / 2, small_buttow_w / 2, button_h, "Удалить");
+            table,
+            big_button_w + (small_buttow_w / 1.5) * 1.7 + spacing_x * 5.5,
+            button_h + button_h / 2 - 3, small_buttow_w / 2, button_h,
+            "Удалить");
 
         UpdateButton* ubut = new UpdateButton(
-            table, big_button_w + (small_buttow_w / 1.5) * 3 + spacing_x * 6,
-            button_h + button_h / 2, small_buttow_w / 2, button_h, "Изменить");
+            table, big_button_w + (small_buttow_w / 1.5) * 2.4 + spacing_x * 7,
+            button_h + button_h / 2 - 3, small_buttow_w / 2, button_h,
+            "Изменить");
 
         DescButton* descB = new DescButton(
             table, big_button_w + spacing_x * 4 + 200 * 2, button_h * 3,

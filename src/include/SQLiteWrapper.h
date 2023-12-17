@@ -7,10 +7,10 @@
 #include <string>
 #include <vector>
 
-class SQLiteWrapper {
+class SQLiteWrapper { // Класс оболчка для базы данных SQLite3
 public:
     SQLiteWrapper(const char* dir, std::string table_name,
-                  int flags = SQLITE_OPEN_READWRITE, //
+                  int flags = SQLITE_OPEN_READWRITE,
                   const char* vfsName = "unix-excl");
 
     ~SQLiteWrapper();
@@ -70,5 +70,4 @@ private:
     std::string table_name;
     std::string sort_query;
     std::string count_query = "SELECT COUNT(*) FROM main." + table_name;
-    std::string sort_symbols_temp;
 };

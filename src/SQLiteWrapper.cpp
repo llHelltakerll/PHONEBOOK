@@ -6,15 +6,19 @@ SQLiteWrapper::SQLiteWrapper(const char* dir, std::string table_name,
     : table_name(table_name)
 {
     int rc = sqlite3_open_v2(dir, &db, flags, vfsName); // открывает базу данных
-    if (rc) { throw std::runtime_error(errMesg()); }
-    setRowCount();
-    setColNames();
-    col_count = col_name_vec.size() - 1;
-    std::string default_sort_query = "SELECT * FROM \"main\".\"" + table_name
-                                     + "\"  ORDER BY "
-                                       "\""
-                                     + col_name_vec[0]
-                                     + "\" ASC LIMIT 0, 49999";
+    if (rc) {
+        throw std::runtime_error(errMesg());
+    } // если открытие произошло с ошибкой кидаем исключение
+    setRowCount(); // Подсчет строк в таблице
+    setColNames(); // Сохранение имен колонок
+    col_count = col_name_vec.size() - 1; // подсчет колонок
+    std::string default_sort_query
+        = "SELECT * FROM \"main\".\"" + table_name
+          + "\"  ORDER BY "
+            "\""
+          + col_name_vec[0]
+          + "\" ASC LIMIT 0, 49999"; // запрос для получения получения данных
+                                     // всей таблицы
     prepare(default_sort_query);
 }
 

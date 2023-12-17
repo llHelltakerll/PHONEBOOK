@@ -7,7 +7,7 @@
 enum {
     big_button_w = 770,
     small_buttow_w = 180,
-    mid_button_w = 270,
+    mid_button_w = 280,
     mid_big_button_w = 480,
     button_h = 28,
     spacing_x = 10,
