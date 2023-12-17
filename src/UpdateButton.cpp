@@ -14,9 +14,9 @@ void UpdateButton::CreateWin()
 {
     if (table->getActiveRow() == -1) {
         ErrorOkWindow* err_win = new ErrorOkWindow(
-            0, 0, 500, 200, "Не выбрана строка для изменения");
+            0, 0, "Не выбран гражданин для изменения!", "Окно ошибок");
         return;
     }
     std::cout << active_row << "\n";
-    win = new UpdateWindow(table, 0, 0, 500, 200, "Изменение");
+    win = new UpdateWindow(table, 0, 0, "Окно изменения");
 }

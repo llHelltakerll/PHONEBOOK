@@ -1,17 +1,33 @@
 #include "include/InsertWindow.h"
 
-InsertWindow::InsertWindow(DataTable*& table, int x, int y, int w, int h,
-                           const char* l)
-    : OFLWindow(x, y, w, h, l), table(table)
+InsertWindow::InsertWindow(DataTable*& table, int x, int y, const char* l)
+    : OFLWindow(x, y, ins_win_w, ins_win_h, l), table(table)
 {
     begin();
-    conf_but = new ConfirmButton(this, 150, 10, 80, 30, "Подтвердить");
-    number_inp = new Fl_Input(0, 10, 100, 30, "телефон:");
+    number_inp
+        = new Fl_Input(spacing_x, button_h, number_inp_w, button_h, "Телефон:");
+    number_inp->align(FL_ALIGN_TOP_LEFT);
+
     number_inp->value("+7 ");
-    full_name_inp = new Fl_Input(0, 50, 100, 30, "фио:");
-    street_inp = new Fl_Input(0, 90, 100, 30, "улица:");
-    house_inp = new Fl_Input(0, 130, 100, 30, "дом:");
-    flat_inp = new Fl_Input(0, 170, 100, 30, "квартира:");
+    full_name_inp = new Fl_Input(spacing_x, button_h * 3, full_name_inp_w,
+                                 button_h, "Фио:");
+    full_name_inp->align(FL_ALIGN_TOP_LEFT);
+
+    street_inp = new Fl_Input(spacing_x, button_h * 5, street_inp_w, button_h,
+                              "Улица:");
+    street_inp->align(FL_ALIGN_TOP_LEFT);
+
+    house_inp = new Fl_Input(street_inp_w + spacing_x * 2, button_h * 5,
+                             house_inp_w, button_h, "Дом:");
+    house_inp->align(FL_ALIGN_TOP_LEFT);
+
+    flat_inp = new Fl_Input(street_inp_w + house_inp_w + spacing_x * 3,
+                            button_h * 5, flat_inp_w, button_h, "Квартира:");
+    flat_inp->align(FL_ALIGN_TOP_LEFT);
+
+    conf_but = new ConfirmButton(this, number_inp_w + spacing_x * 2, button_h,
+                                 conf_button_w, button_h, "Подтвердить");
+    conf_but->labelsize(13);
     set_modal();
     show();
     end();
@@ -37,8 +53,7 @@ void InsertWindow::insertInpValues()
     val_vec[5] = flat_inp->value();
 
     if (table->sw->insert(val_vec) == SQLITE_CONSTRAINT) {
-        err_win = new ErrorOkWindow(0, 0, 400, 150,
-                                    "Ошибка! Введен дубликат номера телефона",
+        err_win = new ErrorOkWindow(0, 0, "Введен дубликат номера телефона!",
                                     "Окно ошибок");
         return;
     }

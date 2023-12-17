@@ -1,12 +1,14 @@
 #include "include/ErrorOkWindow.h"
+#include "include/InsertWindow.h"
 
-ErrorOkWindow::ErrorOkWindow(int x, int y, int w, int h, const char* err_mesg,
-                             const char* l)
-    : OFLWindow(x, y, w, h, l)
+ErrorOkWindow::ErrorOkWindow(int x, int y, const char* err_mesg, const char* l)
+    : OFLWindow(x, y, err_win_w, err_win_h, l)
 {
     begin();
-    label = new Fl_Box(50, 20, 260, 0, err_mesg);
-    conf_but = new ConfirmButton(this, 170, 60, 80, 30, "Ok");
+    label = new Fl_Box(180, 50, 0, 0, err_mesg);
+    conf_but = new ConfirmButton(this, err_win_w / 2 - conf_button_w / 2,
+                                 err_win_h / 3 + button_h, conf_button_w,
+                                 button_h, "Ok");
     set_modal();
     show();
     end();

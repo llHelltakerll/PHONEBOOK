@@ -1,8 +1,7 @@
 #include "include/UpdateWindow.h"
 
-UpdateWindow::UpdateWindow(DataTable*& table, int x, int y, int w, int h,
-                           const char* l)
-    : InsertWindow(table, x, y, w, h, l)
+UpdateWindow::UpdateWindow(DataTable*& table, int x, int y, const char* l)
+    : InsertWindow(table, x, y, l)
 {
     number_inp->value(table->getNumberByRow(table->getActiveRow()).c_str());
     full_name_inp->value(table->getFNByRow(table->getActiveRow()).c_str());
@@ -20,8 +19,7 @@ void UpdateWindow::updateInpValues()
     val_vec[4] = house_inp->value();
     val_vec[5] = flat_inp->value();
     if (table->updateField(val_vec) == SQLITE_CONSTRAINT) {
-        err_win = new ErrorOkWindow(0, 0, 400, 150,
-                                    "Ошибка! Введен дубликат номера телефона",
+        err_win = new ErrorOkWindow(0, 0, "Введен дубликат номера телефона",
                                     "Окно ошибок");
         return;
     }

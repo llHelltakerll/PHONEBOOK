@@ -1,7 +1,5 @@
 #include "include/DataTable.h"
 #include "include/ErrorOkWindow.h"
-#include <FL/Enumerations.H>
-#include <FL/fl_draw.H>
 
 DataTable::DataTable(int x, int y, int w, int h, SQLiteWrapper*& sw,
                      const char* l)
@@ -290,7 +288,10 @@ int DataTable::getActiveRow()
 {
     int active_col{};
     for (int i = 0; i < sw->getRowCount(); i++) {
-        if (active_rows[i] == true) { return i; }
+        if (active_rows[i] == true) {
+            if (info_rows.size() < i) { return -1; }
+            return i;
+        }
     }
     return -1;
 }

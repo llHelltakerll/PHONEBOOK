@@ -5,7 +5,7 @@
 # Compiler settings - Can be customized.
 CC = g++
 CXXFLAGS = -Wall -Wextra -g -march=x86-64 -mtune=generic -O2 -pipe -fno-plt -fexceptions -Wp,-D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fstack-clash-protection -fcf-protection -g -ffile-prefix-map=/build/fltk/src=/usr/src/debug/fltk -flto=auto -ffat-lto-objects -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_THREAD_SAFE -D_REENTRANT -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION
-LDFLAGS =  -lfltk -lm -lX11 -lXext -lpthread -lXinerama -lXfixes -lXcursor -lXft -lXrender -lm -lfontconfig -ldl -lpthread -lsqlite3
+LDFLAGS =  -lfltk -lm -lX11 -lXext -lpthread -lXinerama -lXfixes -lXcursor -lXft -lXrender -lm -lfontconfig -ldl -lpthread -lsqlite3 -lfltk_images 
 
 # Makefile settings - Can be customized.
 CURRENT_DIR := $(CURDIR)

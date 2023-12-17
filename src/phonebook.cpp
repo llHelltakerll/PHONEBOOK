@@ -9,11 +9,12 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Input.H>
+#include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_Window.H>
 #include <iostream>
 #include <vector>
 
-#define DB_DIR "/home/nix/code/phonebookVer/data/sqlitedb.db"
+#define DB_DIR "/home/nix/code/phonebookCurs/data/sqlitedb.db"
 
 enum {
     win_w = 1400,
@@ -30,7 +31,8 @@ int main()
     try {
         sw = new SQLiteWrapper(DB_DIR, "PHONEBOOK");
 
-        Fl_Window* win = new Fl_Window(win_x, win_y, win_w, win_h);
+        Fl_Window* win = new Fl_Window(win_x, win_y, win_w, win_h,
+                                       "Телефонный справочник");
 
         DataTable* table
             = new DataTable(table_x, table_y, table_w, table_h, sw);
@@ -46,12 +48,12 @@ int main()
                                  mid_big_button_w, button_h, "Улица:", 3);
 
         TableInputSort* inp_house_n = new TableInputSort(
-            *table, big_button_w + spacing_x * 2, button_h * 2, small_buttow_w,
-            button_h, "Номер дома:", 4);
+            *table, big_button_w + spacing_x * 2, button_h * 2,
+            small_buttow_w - 50, button_h, "Номер дома:", 4);
 
         TableInputSort* inp_flat = new TableInputSort(
-            *table, big_button_w + spacing_x * 3 + small_buttow_w, button_h * 2,
-            small_buttow_w, button_h, "Квартира: ", 5);
+            *table, big_button_w + spacing_x * 3 + small_buttow_w - 50,
+            button_h * 2, small_buttow_w - 50, button_h, "Квартира: ", 5);
 
         std::vector<Fl_Input*> inp_vec
             = {inp_p_number, inp_full_name, inp_street, inp_house_n, inp_flat};
@@ -78,8 +80,13 @@ int main()
             "Изменить");
 
         DescButton* descB = new DescButton(
-            table, big_button_w + spacing_x * 4 + 200 * 2, button_h * 3,
+            table, big_button_w + spacing_x * 4 + 195 * 2, button_h * 3.5,
             small_buttow_w / 8, button_h, "По убыванию");
+
+        Fl_PNG_Image image("/home/nix/Изображения/m_Pn7.png");
+
+        Fl_Box box(win_w - 150, button_h, 100, 100);
+        box.image(image.copy());
 
         win->resizable(win);
         win->show();
