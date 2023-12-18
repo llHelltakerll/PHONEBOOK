@@ -90,7 +90,9 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
     }
 
     if (clear) {
-        input_values.clear();
+        for (int i = 0; i < input_values.size(); i++) {
+            input_values[i].clear();
+        }
         input_values.resize(col_count);
     }
 

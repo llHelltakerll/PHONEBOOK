@@ -38,7 +38,9 @@ void DataTable::sort(int c, std::string val, bool input, bool clear_prev)
     bool cast_to_int = false;
 
     if (clear_prev) {
-        input_values.clear();
+        for (int i = 0; i < input_values.size(); i++) {
+            input_values[i].clear();
+        }
         inp_temp.val.clear();
     }
 
