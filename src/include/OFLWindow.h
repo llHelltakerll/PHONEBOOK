@@ -12,7 +12,7 @@ public:
 private:
     static void windowCallback(Fl_Widget* w, void* data)
     {
-        // if (Fl::event_key() == FL_Escape) { return; }
+        if (Fl::event_key() == FL_Escape && Fl::event() != FL_CLOSE) { return; }
 
         OFLWindow* a_w = reinterpret_cast<OFLWindow*>(w);
         a_w->Interaction();

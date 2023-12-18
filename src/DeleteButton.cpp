@@ -14,7 +14,7 @@ void DeleteButton::Press()
 void DeleteButton::deleteField()
 {
     if (table->getActiveRow() == -1) {
-        err_win = new ErrorOkWindow(0, 0, "Не выбран гражданин для изменения!",
+        err_win = new ErrorOkWindow(0, 0, "Не выбран гражданин для удаления!",
                                     "Окно ошибок");
         return;
     }

@@ -1,6 +1,8 @@
 #include "include/DataTable.h"
 #include "include/ErrorOkWindow.h"
 
+static const Fl_Color darkGrayColor = fl_rgb_color(160, 160, 160);
+
 DataTable::DataTable(int x, int y, int w, int h, SQLiteWrapper*& sw,
                      const char* l)
     : OFLTable(x, y, w, h, l, sw->getColCount(), sw->getRowCount()), sw(sw),
@@ -35,44 +37,36 @@ void DataTable::sort(int c, std::string val, bool input, bool clear_prev)
     int active_col{};
     bool cast_to_int = false;
 
-    if (clear_prev) { input_values.clear(); }
+    if (clear_prev) {
+        input_values.clear();
+        inp_temp.val.clear();
+    }
 
     if (input) {
-        inp_val.val = val;
-        inp_val.col = c;
-        input_values[c - 1] = val;
+        inp_temp.val = val;
+        inp_temp.col = c;
+        input_values[c] = val;
     }
 
     if (c == 4 || c == 5) { cast_to_int = true; }
 
     for (int i = 0; i < sw->getColCount(); i++) {
-        std::cout << "VALUES: " << input_values[i];
-    }
-    std::cout << "\nEND\n";
-
-    for (int i = 0; i < sw->getColCount(); i++) {
         if (active_cols[i] == true) { active_col = i + 1; }
     }
 
-    if (val.empty() && inp_val.val.empty()) {
+    if (val.empty() && inp_temp.val.empty()) {
         if (active_col == 0 && c == 0) {
             sw->sortBy(0, val, active_col, invert_temp, clear_prev,
                        cast_to_int);
         }
         else {
-            sw->sortBy(c, input_values[c - 1], active_col, invert_temp,
-                       clear_prev, cast_to_int);
+            sw->sortBy(c, input_values[c], active_col, invert_temp, clear_prev,
+                       cast_to_int);
         }
     }
-    else if (!inp_val.val.empty()) {
-        if (active_col == 0 && c == 0) {
-            sw->sortBy(c, input_values[c - 1], active_col, invert_temp,
-                       clear_prev, cast_to_int);
-        }
-        else {
-            sw->sortBy(c, input_values[c - 1], active_col, invert_temp,
-                       clear_prev, cast_to_int);
-        }
+    else if (!inp_temp.val.empty()) {
+        sw->sortBy(c, input_values[c], active_col, invert_temp, clear_prev,
+                   cast_to_int);
     }
     init_table_info();
     redraw();
@@ -82,7 +76,7 @@ void DataTable::sort(int c, std::string val, bool input, bool clear_prev)
 void DataTable::setInvert(bool invert)
 {
     invert_temp = invert;
-    sort(inp_val.col, input_values[inp_val.col]);
+    sort(inp_temp.col, input_values[inp_temp.col]);
 }
 void DataTable::init_table_info()
 {
@@ -109,7 +103,7 @@ void DataTable::push_col_callback()
             for (int i = 0; i < sw->getColCount(); i++) {
                 if (i != C) active_cols[i] = false;
             }
-            sort(C + 1, "");
+            sort(C, "");
         }
         else {
             active_cols[C] = false;
@@ -125,14 +119,11 @@ void DataTable::push_row_callback()
         std::string symbol;
         int R = callback_row();
         if (active_rows[R] == false) {
+            active_rows[getActiveRow()] = false;
             active_rows[R] = true;
             symbol = "@>";
-            for (int i = 0; i < sw->getRowCount(); i++) {
-                if (i != R) active_rows[i] = false;
-            }
         }
         else {
-            symbol = "";
             active_rows[R] = false;
         }
 
@@ -247,7 +238,6 @@ std::string DataTable::getHeaderColName(int C) const
     return "";
 }
 
-Fl_Color darkGrayColor = fl_rgb_color(160, 160, 160);
 void DataTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
                           int W, int H)
 {
@@ -304,7 +294,7 @@ void DataTable::deleteById()
 void DataTable::refreshTable()
 {
     input_values.resize(sw->getColCount());
-    sort(inp_val.col, "", true, true);
+    sort(inp_temp.col, "", true, true);
 }
 
 void DataTable::undoTable()

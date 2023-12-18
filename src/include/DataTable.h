@@ -97,12 +97,11 @@ private:
     int rows_count;
     std::vector<db_rows> info_rows;
     std::vector<std::string> input_values;
-    struct input_value {
-        int col = 1;
+    struct input_temp {
+        int col;
         std::string val;
     };
-    std::vector<input_value> inp_val_vec;
-    input_value inp_val;
+    input_temp inp_temp;
     bool invert_temp;
 public:
     SQLiteWrapper* sw;

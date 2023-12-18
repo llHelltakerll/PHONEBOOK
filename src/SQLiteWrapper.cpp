@@ -11,7 +11,8 @@ SQLiteWrapper::SQLiteWrapper(const char* dir, std::string table_name,
     } // если открытие произошло с ошибкой кидаем исключение
     setRowCount(); // Подсчет строк в таблице
     setColNames(); // Сохранение имен колонок
-    col_count = col_name_vec.size() - 1; // подсчет колонок
+    col_count = col_name_vec.size(); // подсчет колонок
+    input_values.resize(col_count);
     std::string default_sort_query
         = "SELECT * FROM \"main\".\"" + table_name
           + "\"  ORDER BY "
@@ -35,11 +36,6 @@ const char* SQLiteWrapper::errMesg()
 
 void SQLiteWrapper::prepare(std::string comd)
 {
-    static int i;
-    if (i == 0) {
-        final();
-        i++;
-    }
     int rc = sqlite3_prepare_v2(db, comd.c_str(), -1, &stmt, 0);
 
     if (rc != SQLITE_OK) { throw std::runtime_error(errMesg()); }
@@ -68,27 +64,37 @@ std::string SQLiteWrapper::getColText(int col) const
 void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
                            bool invert, bool clear, bool cast_to_int)
 {
-    std::string cast;
-    std::string as_int;
-    if (cast_to_int) {
-        cast = "CAST(";
-        as_int = " AS INTEGER)";
-    }
-    if (clear) {
-        input_values.clear();
-        input_values.resize(getColCount());
-    }
-    std::string invert_comd;
     const char* previousLocale = std::setlocale(LC_CTYPE, nullptr);
     std::setlocale(LC_CTYPE, "ru_RU.UTF-8");
+
+    std::string cast;
+    std::string as_int;
+    std::string invert_comd;
+    std::string where = " WHERE ";
 
     std::size_t len = std::mbstowcs(nullptr, val.c_str(), 0);
     wchar_t* wbuffer = new wchar_t[len + 1];
     std::mbstowcs(wbuffer, val.c_str(), len);
     wbuffer[len] = L'\0';
     std::wstring wstr(wbuffer);
-
     std::wstring result;
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+
+    input_values[where_col] = val;
+
+    delete[] wbuffer;
+
+    if (cast_to_int) {
+        cast = "CAST(";
+        as_int = " AS INTEGER)";
+    }
+
+    if (clear) {
+        input_values.clear();
+        input_values.resize(col_count);
+    }
+
+    if (invert) { invert_comd = "DESC"; }
 
     for (wchar_t ch: wstr) {
         result += L"[";
@@ -97,29 +103,25 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
         result += L"]";
     }
 
-    delete[] wbuffer;
-
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
     val = converter.to_bytes(result);
 
-    if (invert) { invert_comd = "DESC"; }
-    input_values[where_col] = val;
-    std::string where = " WHERE ";
-    for (int i = 1; i <= getColCount(); i++) {
+    for (int i = 0; i < col_count; i++) {
         where += col_name_vec[i];
         where += " GLOB '*";
         where += input_values[i];
         where += "*'";
-        if (i == getColCount()) break;
+        if (i == col_count - 1) break;
         where += " AND ";
     };
+
     sort_query = "SELECT * FROM main." + table_name + where
                  + " COLLATE UNICODE "
                    "ORDER BY ("
                  + cast + col_name_vec[order_col] + as_int + ") " + invert_comd
                  + " LIMIT 0, 49999;";
+
     std::setlocale(LC_CTYPE, previousLocale);
-    std::cout << sort_query << "\n";
+    // std::cout << sort_query << "\n";
     prepare(sort_query);
     setPrevQuery(sort_query);
 }
@@ -134,7 +136,6 @@ void SQLiteWrapper::setRowCount()
 {
     prepare(count_query);
     if (step()) { row_count = copyColInt(0); }
-    input_values.resize(row_count);
 }
 
 void SQLiteWrapper::setColNames()
@@ -176,24 +177,9 @@ int SQLiteWrapper::insert(std::vector<std::string> cells_name)
           + cells_name[1] + "', '" + cells_name[2] + "', '" + cells_name[3]
           + "', '" + cells_name[4] + "', '" + cells_name[5] + "');";
 
-    std::cout << insertDataQuery << "\n";
-
-    std::cout << "IIIIIIIIIIIII" << std::endl;
-
     // Выполняем SQL-запрос
     int result = exec(insertDataQuery);
 
-    // // Обрабатываем результат выполнения
-    // if (result == SQLITE_CONSTRAINT) {
-    //     std::cerr << "Duplicate phone number. Handle the duplicate entry."
-    //               << std::endl;
-    //     return 1;
-    // }
-    // else if (result != SQLITE_OK) {
-    //     std::cerr << "Execution failed." << std::endl;
-    //     return 2;
-    // }
-    // std::cout << "Insertion successful." << std::endl;
     setRowCount();
     return result;
 }
@@ -207,17 +193,6 @@ int SQLiteWrapper::update(int id, int col, std::string str)
                                + std::to_string(id) + "';";
     int result = exec(update_query);
 
-    // Обрабатываем результат выполнения
-    // if (result == SQLITE_CONSTRAINT) {
-    //     std::cerr << "Duplicate phone number. Handle the duplicate entry."
-    //               << std::endl;
-    //     return 1;
-    // }
-    // else if (result != SQLITE_OK) {
-    //     std::cerr << "Execution failed." << std::endl;
-    //     return 2;
-    // }
-    // std::cout << "Insertion successful." << std::endl;
     setRowCount();
     return result;
 }

@@ -12,6 +12,5 @@ void InsertButton::Press()
 
 void InsertButton::CreateWin()
 {
-    std::cout << active_row << "\n";
     win = new InsertWindow(table, 0, 0, "Окно вставки");
 }
