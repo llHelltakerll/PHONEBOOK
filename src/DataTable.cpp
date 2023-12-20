@@ -50,10 +50,12 @@ void DataTable::sort(int c, std::string val, bool input, bool clear_prev)
         input_values[c] = val;
     }
 
-    if (c == 4 || c == 5) { cast_to_int = true; }
-
     for (int i = 0; i < sw->getColCount(); i++) {
         if (active_cols[i] == true) { active_col = i + 1; }
+    }
+
+    if (active_col == 4 || active_col == 5 || c == 4 || c == 5) {
+        cast_to_int = true;
     }
 
     if (val.empty() && inp_temp.val.empty()) {

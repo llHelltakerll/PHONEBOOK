@@ -123,7 +123,7 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
                  + " LIMIT 0, 49999;";
 
     std::setlocale(LC_CTYPE, previousLocale);
-    // std::cout << sort_query << "\n";
+    std::cout << sort_query << "\n";
     prepare(sort_query);
     setPrevQuery(sort_query);
 }
