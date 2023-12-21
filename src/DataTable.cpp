@@ -57,6 +57,9 @@ void DataTable::sort(int c, std::string val, bool input, bool clear_prev)
     if (active_col == 4 || active_col == 5 || c == 4 || c == 5) {
         cast_to_int = true;
     }
+    else {
+        cast_to_int = false;
+    }
 
     if (val.empty() && inp_temp.val.empty()) {
         if (active_col == 0 && c == 0) {
