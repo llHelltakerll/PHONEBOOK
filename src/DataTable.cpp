@@ -187,7 +187,7 @@ void DataTable::set_col(int COL, int ROW, int X, int Y, int W, int H)
 
 int DataTable::updateField(std::vector<std::string> upd_vals)
 {
-    for (int i = 1; i <= sw->getColCount(); i++) {
+    for (int i = 1; i < sw->getColCount(); i++) {
         if (sw->update(std::atoi(info_rows[getActiveRow()].id.c_str()), i,
                        upd_vals[i])
             == SQLITE_CONSTRAINT) {

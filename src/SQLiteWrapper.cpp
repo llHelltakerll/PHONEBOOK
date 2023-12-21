@@ -80,8 +80,6 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
     std::wstring result;
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 
-    input_values[where_col] = val;
-
     delete[] wbuffer;
 
     if (cast_to_int) {
@@ -106,6 +104,8 @@ void SQLiteWrapper::sortBy(int where_col, std::string val, int order_col,
     }
 
     val = converter.to_bytes(result);
+
+    input_values[where_col] = val;
 
     for (int i = 0; i < col_count; i++) {
         where += col_name_vec[i];
